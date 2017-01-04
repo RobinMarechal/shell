@@ -1,0 +1,22 @@
+# depslib dependency file v1.0
+1483523733 source:/home/gregoire/Bureau/shell/cmd.c
+	"cmd.h"
+
+1451925566 /home/gregoire/Bureau/shell/cmd.h
+
+1451860308 source:/home/gregoire/Bureau/shell/main.c
+	<pwd.h>
+	<readline/readline.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<sys/types.h>
+	<unistd.h>
+	"shell_fct.h"
+
+1451860150 /home/gregoire/Bureau/shell/shell_fct.h
+	"cmd.h"
+
+1451858940 source:/home/gregoire/Bureau/shell/shell_fct.c
+	"shell_fct.h"
+
