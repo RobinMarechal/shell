@@ -4,22 +4,22 @@
 typedef struct command {
     //the command originally inputed by the user
     char *init_cmd;
-    
+
     //number of members
     unsigned int nb_cmd_members;
-    
+
     //each position holds a command member
     char **cmd_members;
-    
+
     //cmd_members_args[i][j] holds the jth argument of the ith member
     char ***cmd_members_args;
-    
+
     //number of arguments per member
     unsigned int *nb_members_args;
-    
+
     //the path to the redirection file
     char ***redirection;
-    
+
     //the redirecction type (append vs. override)
     int **redirection_type;
 } cmd;
@@ -50,3 +50,6 @@ void parse_members(char *s,cmd *c);
 
 //Remplit les champs redir et type_redir
 void parse_redirection(unsigned int i, cmd *c);
+
+
+char * IMPLEMENT(subString)(const char * start, const char * end);
