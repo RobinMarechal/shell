@@ -28,13 +28,28 @@ int main(int argc, char** argv)
         //Print it to the console
 		sprintf(str, "\n{myshell}%s@%s:%s$ ", infos->pw_name, hostname, workingdirectory);
 		readlineptr = readline(str);
-        
+
         //Your code goes here.......
+
         //Parse the comand
+
+        // Initialisation of the command.
+        struct command cmd;
+
+        cmd.init_cmd = readlineptr;
+        cmd.nb_cmd_members = 1;
+        cmd.cmd_members = NULL;
+        cmd.cmd_members_args = NULL;
+        cmd.nb_members_args = NULL;
+        cmd.redirection = NULL;
+        cmd.redirection_type = NULL;
+
+        print_members(&cmd);
+
         //Execute the comand
         //Clean the house
         //..........
-        
+
 	}
 	//..........
 	return 0;
