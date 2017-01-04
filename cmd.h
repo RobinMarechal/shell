@@ -1,7 +1,8 @@
 //Command is well-formed
 #define MYSHELL_CMD_OK 0
 
-typedef struct command {
+typedef struct command
+{
     //the command originally inputed by the user
     char *init_cmd;
 
