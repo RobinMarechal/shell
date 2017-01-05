@@ -21,6 +21,8 @@ int main(int argc, char** argv)
 	//..........
 	while(ret != MYSHELL_FCT_EXIT)
 	{
+	    int i;
+
 		//Get your session info
         infos=getpwuid(getuid());
 		gethostname(hostname, 256);
@@ -45,6 +47,7 @@ int main(int argc, char** argv)
         cmd->redirection_type = NULL;
 
         parse_members(cmd->init_cmd, cmd);
+
 		parse_members_args(cmd);
         print_members(cmd);
 
