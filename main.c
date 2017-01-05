@@ -54,6 +54,8 @@ int main(int argc, char** argv)
         for (i = 0; i < cmd->nb_cmd_members; i++)
             parse_redirection(i, cmd);
 
+		parse_members_args(cmd);
+
         //print_members(&cmd);
 
         //Execute the comand
