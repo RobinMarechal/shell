@@ -52,7 +52,6 @@ void parse_members(char *s,cmd *c);
 //Remplit les champs redir et type_redir
 void parse_redirection(unsigned int i, cmd *c);
 
-
-char * IMPLEMENT(subString)(const char * start, const char * end);
-
 char * trim(char * str);
+
+char * subString(const char * start, const char * end);

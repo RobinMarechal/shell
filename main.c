@@ -34,17 +34,19 @@ int main(int argc, char** argv)
         //Parse the comand
 
         // Initialisation of the command.
-        struct command cmd;
+        struct command * cmd;
 
-        cmd.init_cmd = readlineptr;
-        cmd.nb_cmd_members = 1;
-        cmd.cmd_members = NULL;
-        cmd.cmd_members_args = NULL;
-        cmd.nb_members_args = NULL;
-        cmd.redirection = NULL;
-        cmd.redirection_type = NULL;
+        cmd->init_cmd = readlineptr;
+        cmd->nb_cmd_members = 0;
+        cmd->cmd_members = NULL;
+        cmd->cmd_members_args = NULL;
+        cmd->nb_members_args = NULL;
+        cmd->redirection = NULL;
+        cmd->redirection_type = NULL;
 
-        print_members(&cmd);
+        parse_members(cmd->init_cmd, cmd);
+		parse_members_args(cmd);
+        //print_members(&cmd);
 
         //Execute the comand
         //Clean the house
