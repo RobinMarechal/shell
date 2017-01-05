@@ -21,6 +21,8 @@ int main(int argc, char** argv)
 	//..........
 	while(ret != MYSHELL_FCT_EXIT)
 	{
+	    int i;
+
 		//Get your session info
         infos=getpwuid(getuid());
 		gethostname(hostname, 256);
@@ -45,6 +47,13 @@ int main(int argc, char** argv)
         cmd->redirection_type = NULL;
 
         parse_members(cmd->init_cmd, cmd);
+
+        cmd->redirection = malloc(cmd->nb_cmd_members * sizeof(char **));
+        cmd->redirection_type = malloc(cmd->nb_cmd_members * sizeof(int));
+
+        for (i = 0; i < cmd->nb_cmd_members; i++)
+            parse_redirection(i, cmd);
+
         //print_members(&cmd);
 
         //Execute the comand

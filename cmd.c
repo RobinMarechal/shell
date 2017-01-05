@@ -106,7 +106,83 @@ void parse_members(char *s, cmd *c)
 //Remplit les champs redir et type_redir
 void parse_redirection(unsigned int i, cmd *c)
 {
+    char * flux = NULL;
+    int numberOfChevron = 0;
 
+    size_t sizeOfMember = strlen(c->cmd_members[i]);
+
+    if ((c->redirection[i] = malloc(3 * sizeof(char *))) == NULL)
+    {
+        printf("Error !");
+        exit(-1);
+    }
+
+    // Recherche des flux.
+
+    // UTILISER FONCTION ROBIN POUR SUPPRIMER ESPACE AU DEBUT ET A LA FIN !!
+
+    // STDIN.
+    if ((flux = strchr(c->cmd_members[i], '<')) != NULL)
+    {
+        flux = subString(flux + 1, flux + strlen(flux));
+
+        // Il peut y avoir un ou plusieurs chevrons.
+        while (strchr(flux, '<') != NULL)
+            flux = subString(flux + 1, flux + strlen(flux));
+
+        if ((c->redirection[i][0] = malloc(sizeOfMember * sizeof(char))) == NULL)
+        {
+            printf("Error !");
+            exit(-1);
+        }
+
+        strcpy(c->redirection[i][0], flux);
+
+        // STDOUT et STDERR mis à NULL;
+        c->redirection[i][1] = NULL;
+        c->redirection[i][2] = NULL;
+    }
+
+    // STDOUT.
+    else if ((flux = strchr(c->cmd_members[i], '>')) != NULL)
+    {
+        numberOfChevron++;
+
+        // Il peut y avoir un ou plusieurs chevrons.
+         while (strchr(flux, '>') != NULL)
+         {
+            flux = subString(flux + 1, flux + strlen(flux));
+
+            numberOfChevron++;
+         }
+
+        if ((c->redirection[i][1] = malloc(sizeOfMember * sizeof(char))) == NULL)
+        {
+            printf("Error !");
+            exit(-1);
+        }
+
+        strcpy(c->redirection[i][1], flux);
+
+        // STDOUT et STDERR mis à NULL;
+        c->redirection[i][0] = NULL;
+        c->redirection[i][2] = NULL;
+
+        // S'il y a plusieurs chevrons, la redirection est de type "APPEND".
+        // Sinon, elle est de type "OVERRIDE".
+
+        if (numberOfChevron > 1)
+            c->redirection[i] = APPEND;
+
+        else
+        c->redirection[i] = OVERRIDE;
+    }
+
+    /*if (c->redirection[i][0] != NULL)
+            printf("%s\n", c->redirection[i][0]);
+
+    if (c->redirection[i][1] != NULL)
+        printf("%s\n", c->redirection[i][1]);*/
 }
 
 char * subString(const char * start, const char * end) {

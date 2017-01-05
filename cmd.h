@@ -25,6 +25,12 @@ typedef struct command
     int **redirection_type;
 } cmd;
 
+enum type
+{
+    APPEND,
+    OVERRIDE
+};
+
 //Prints the contents of members_args to the console
 void print_members_args(cmd *c);
 
