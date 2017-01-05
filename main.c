@@ -46,7 +46,7 @@ int main(int argc, char** argv)
 
         parse_members(cmd->init_cmd, cmd);
 		parse_members_args(cmd);
-        //print_members(&cmd);
+        print_members(cmd);
 
         //Execute the comand
         //Clean the house

@@ -5,19 +5,20 @@
 //Your includes come here
 
 //Prints the contents of members_args to the console
-void print_members_args(cmd *c){
-    unsigned int i, j;
-    char ** member_args;
-    unsigned int nb;
-    for (i = 0; i < c->nb_cmd_members; i++)
-    {
-        member_args = c->cmd_members_args[i];
-        nb = c->nb_members_args[i];
-        for (j = 0; j < nb; j++)
-        {
-            printf("%s ", member_args[j]);
-        }
-    }
+void print_members_args(cmd *c)
+{
+    // unsigned int i, j;
+    // char ** member_args;
+    // unsigned int nb;
+    // for (i = 0; i < c->nb_cmd_members; i++)
+    // {
+    //     member_args = c->cmd_members_args[i];
+    //     nb = c->nb_members_args[i];
+    //     for (j = 0; j < nb; j++)
+    //     {
+    //         printf("%s ", member_args[j]);
+    //     }
+    // }
 }
 
 //Frees the memory allocated to store member arguments
@@ -29,7 +30,13 @@ void free_members_args(cmd *c)
 //Prints the contents of members to the console
 void print_members(cmd *c)
 {
-
+    unsigned int i = 0;
+    printf("------- MEMBERS ------- \n");
+    for (i = 0; i < c->nb_cmd_members; i++)
+    {
+        printf("%s\n", c->cmd_members[i]);
+    }
+    printf("\n");
 }
 
 //Frees the memory allocated to store member information
