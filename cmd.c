@@ -56,7 +56,7 @@ void parse_members_args(cmd *c)
     char sep[2] = " ";
 
     c->cmd_members_args = (char ***) malloc(c->nb_cmd_members * sizeof(char **));
-    c->nb_members_args = (int *) malloc(c->nb_cmd_members * sizeof(int));
+    c->nb_members_args = (unsigned int *) malloc(c->nb_cmd_members * sizeof(int));
     if(c->cmd_members_args == NULL || c->nb_members_args == NULL)
     {
         printf("ERROR: malloc()\n");
@@ -114,7 +114,8 @@ void parse_members(char *s, cmd *c)
     // Le cas où il y a plusieurs membres.
     while ((pipe = strchr(s, '|')) != NULL)
     {
-        char * member = subString(s, pipe);
+        // On saute l'espace de fin.
+        char * member = subString(s, pipe - 1);
 
         c->nb_cmd_members++;
 
@@ -132,8 +133,10 @@ void parse_members(char *s, cmd *c)
 
         strcpy(c->cmd_members[c->nb_cmd_members - 1], member);
 
-        s = pipe + 1;
+        // On saute l'espace de début.
+        s = pipe + 2;
     }
+
 
     // Le cas où il n'y a qu'un membre ou s'il s'agit du dernier.
     c->nb_cmd_members++;
@@ -156,7 +159,7 @@ void parse_members(char *s, cmd *c)
 //Remplit les champs redir et type_redir
 void parse_redirection(unsigned int i, cmd *c)
 {
-    //your implementation comes here
+
 }
 
 char * subString(const char * start, const char * end) {
