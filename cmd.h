@@ -54,3 +54,5 @@ void parse_redirection(unsigned int i, cmd *c);
 
 
 char * IMPLEMENT(subString)(const char * start, const char * end);
+
+char * trim(char * str);
