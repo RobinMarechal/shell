@@ -16,10 +16,6 @@ void print_members_args(cmd *c){
             printf("%s ", member_args[j]);
         }
     }
-
-void print_members_args(cmd *c)
-{
-    //your implementation comes here
 }
 
 //Frees the memory allocated to store member arguments
@@ -60,7 +56,48 @@ void parse_members_args(cmd *c)
 //Remplit les champs initial_cmd, membres_cmd et nb_membres
 void parse_members(char *s, cmd *c)
 {
-    int i = 0;
+    char * pipe = NULL;
+
+    // Le cas où il y a plusieurs membres.
+    while ((pipe = strchr(s, '|')) != NULL)
+    {
+        char * member = subString(s, pipe);
+
+        c->nb_cmd_members++;
+
+        if ((c->cmd_members = (char **) realloc(c->cmd_members, c->nb_cmd_members * sizeof(char *))) == NULL)
+        {
+            printf("Error !");
+            exit(-1);
+        }
+
+        if ((c->cmd_members[c->nb_cmd_members - 1] = malloc(sizeof(char) * (strlen(member) + 1))) == NULL)
+        {
+            printf("Error !");
+            exit(-1);
+        }
+
+        strcpy(c->cmd_members[c->nb_cmd_members - 1], member);
+
+        s = pipe + 1;
+    }
+
+    // Le cas où il n'y a qu'un membre ou s'il s'agit du dernier.
+    c->nb_cmd_members++;
+
+    if ((c->cmd_members = (char **) realloc(c->cmd_members, c->nb_cmd_members * sizeof(char *))) == NULL)
+    {
+        printf("Error !");
+        exit(-1);
+    }
+
+    if ((c->cmd_members[c->nb_cmd_members - 1] = (char *) malloc(sizeof(char) * (strlen(s) + 1))) == NULL)
+    {
+        printf("Error !");
+        exit(-1);
+    }
+
+    strcpy(c->cmd_members[c->nb_cmd_members - 1], s);
 }
 
 //Remplit les champs redir et type_redir
@@ -69,7 +106,7 @@ void parse_redirection(unsigned int i, cmd *c)
     //your implementation comes here
 }
 
-char * IMPLEMENT(subString)(const char * start, const char * end) {
+char * subString(const char * start, const char * end) {
     char * str = malloc( (size_t) ( end - start + 1 ) );
     int i = 0;
     while(start+i != end && start[i] != '\0')

@@ -1,10 +1,11 @@
 # depslib dependency file v1.0
-1483525682 source:/home/gregoire/Bureau/shell/cmd.c
+1483602114 source:/home/gregoire/Bureau/shell/cmd.c
 	"cmd.h"
+	<string.h>
 
-1483525018 /home/gregoire/Bureau/shell/cmd.h
+1483526938 /home/gregoire/Bureau/shell/cmd.h
 
-1483525735 source:/home/gregoire/Bureau/shell/main.c
+1483602219 source:/home/gregoire/Bureau/shell/main.c
 	<pwd.h>
 	<readline/readline.h>
 	<stdio.h>
