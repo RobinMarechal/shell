@@ -51,6 +51,16 @@ int main(int argc, char** argv)
 		parse_members_args(cmd);
         print_members(cmd);
 
+        cmd->redirection = malloc(cmd->nb_cmd_members * sizeof(char **));
+        cmd->redirection_type = malloc(cmd->nb_cmd_members * sizeof(int *));
+
+        for (i = 0; i < cmd->nb_cmd_members; i++)
+        {
+            parse_redirection(i, cmd);
+
+            print_redirection(cmd, i);
+        }
+
         //Execute the comand
         //Clean the house
         //..........

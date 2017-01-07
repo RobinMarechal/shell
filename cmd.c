@@ -48,7 +48,27 @@ void free_members(cmd *c)
 //Prints the redirection information for member i
 void print_redirection(cmd *c, int i)
 {
-    //your implementation comes here
+    int j;
+
+    printf("\n------- REDIRECTION ------- \n");
+
+    for (j = 0; j < 3; j++)
+    {
+        if (c->redirection[i][j] != NULL)
+        {
+            printf("%s\n", c->redirection[i][j]);
+
+            break;
+        }
+    }
+
+    printf("\n------- TYPE OF REDIRECTION ------- \n");
+
+    if (c->redirection_type[i][APPEND] == 1)
+        printf("La redirection du membre %d est de type APPEND.\n", i + 1);
+
+    else if (c->redirection_type[i][OVERRIDE] == 1)
+        printf("La redirection du membre %d est de type OVERRIDE.\n", i + 1);
 }
 
 //Frees the memory allocated to store redirection info
@@ -122,7 +142,7 @@ void parse_members(char *s, cmd *c)
     while ((pipe = strchr(s, '|')) != NULL)
     {
         // On saute l'espace de fin.
-        char * member = subString(s, pipe - 1);
+        char * member = subString(s, pipe);
 
         c->nb_cmd_members++;
 
@@ -141,9 +161,9 @@ void parse_members(char *s, cmd *c)
         strcpy(c->cmd_members[c->nb_cmd_members - 1], member);
 
         // On saute l'espace de début.
-        s = pipe + 2;
-    }
 
+        s = pipe + 1;
+    }
 
     // Le cas où il n'y a qu'un membre ou s'il s'agit du dernier.
     c->nb_cmd_members++;
@@ -177,11 +197,21 @@ void parse_redirection(unsigned int i, cmd *c)
         exit(-1);
     }
 
+    if ((c->redirection_type[i] = malloc(2 * sizeof(int))) == NULL)
+    {
+        printf("Error !");
+        exit(-1);
+    }
+
+    // Initialisation des types de flux.
+
+    c->redirection_type[i][APPEND] = 0;
+    c->redirection_type[i][OVERRIDE] = 0;
+
     // Recherche des flux.
 
-    // UTILISER FONCTION ROBIN POUR SUPPRIMER ESPACE AU DEBUT ET A LA FIN !!
-
     // STDIN.
+
     if ((flux = strchr(c->cmd_members[i], '<')) != NULL)
     {
         flux = subString(flux + 1, flux + strlen(flux));
@@ -208,6 +238,8 @@ void parse_redirection(unsigned int i, cmd *c)
     {
         numberOfChevron++;
 
+        flux = subString(flux + 1, flux + strlen(flux));
+
         // Il peut y avoir un ou plusieurs chevrons.
          while (strchr(flux, '>') != NULL)
          {
@@ -232,10 +264,16 @@ void parse_redirection(unsigned int i, cmd *c)
         // Sinon, elle est de type "OVERRIDE".
 
         if (numberOfChevron > 1)
-            c->redirection[i] = APPEND;
+        {
+            c->redirection_type[i][APPEND] = 1;
+            c->redirection_type[i][OVERRIDE] = 0;
+        }
 
         else
-        c->redirection[i] = OVERRIDE;
+        {
+            c->redirection_type[i][APPEND] = 0;
+            c->redirection_type[i][OVERRIDE] = 1;
+        }
     }
 }
 
