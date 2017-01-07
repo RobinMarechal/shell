@@ -1,4 +1,9 @@
 *.o
-myshell
+*.depend
 *.gch
+*.layout
+myshell
 main.c
+/bin
+/obj
+/shell
