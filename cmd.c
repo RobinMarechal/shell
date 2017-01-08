@@ -1,4 +1,4 @@
-#include "cmd.h" 
+#include "cmd.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -191,13 +191,13 @@ void parse_redirection(unsigned int i, cmd *c)
 
     size_t sizeOfMember = strlen(c->cmd_members[i]);
 
-    if ((c->redirection[i] = malloc(3 * sizeof(char *))) == NULL)
+    if ((c->redirection[i] = (char **) malloc(3 * sizeof(char *))) == NULL)
     {
         printf("Error !");
         exit(-1);
     }
 
-    if ((c->redirection_type[i] = malloc(2 * sizeof(int))) == NULL)
+    if ((c->redirection_type[i] = (int *) malloc(2 * sizeof(int))) == NULL)
     {
         printf("Error !");
         exit(-1);
@@ -220,7 +220,7 @@ void parse_redirection(unsigned int i, cmd *c)
         while (strchr(flux, '<') != NULL)
             flux = subString(flux + 1, flux + strlen(flux));
 
-        if ((c->redirection[i][0] = malloc(sizeOfMember * sizeof(char))) == NULL)
+        if ((c->redirection[i][0] = (char *) malloc(sizeOfMember * sizeof(char))) == NULL)
         {
             printf("Error !");
             exit(-1);
@@ -248,7 +248,7 @@ void parse_redirection(unsigned int i, cmd *c)
             numberOfChevron++;
          }
 
-        if ((c->redirection[i][1] = malloc(sizeOfMember * sizeof(char))) == NULL)
+        if ((c->redirection[i][1] = (char *) malloc(sizeOfMember * sizeof(char))) == NULL)
         {
             printf("Error !");
             exit(-1);
@@ -296,22 +296,15 @@ char * trim(char * str)
         return NULL;
 
     char * end;
-    char * result;
 
     while(*str == ' ')
     {
         str++;
     }
-    end = str;
 
-    if((end = strchr(str, ' ')) == NULL)
-    {
-        result = subString(str, strchr(str, '\0'));
-    }
-    else
-    {
-        result = subString(str, end);
-    }
+    end = strchr(str, '\0');
+    while(*(end-1) == ' ')
+        end--;
 
-    return result;
+    return subString(str, end);
 }
