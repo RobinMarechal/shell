@@ -30,7 +30,17 @@ void print_members_args(cmd *c)
 //Frees the memory allocated to store member arguments
 void free_members_args(cmd *c)
 {
-    //your implementation comes here
+    // unsigned int i, j;
+    //
+    // for(i = 0; i < c->nb_cmd_members; i++)
+    // {
+    //     for(j = 0; j < c->nb_members_args[i]; i++)
+    //         free(c->cmd_members_args[i][j]);
+    //
+    //     free(c->cmd_members_args[i]);
+    // }
+    //
+    // free(c->cmd_members_args);
 }
 
 //Prints the contents of members to the console
@@ -48,7 +58,14 @@ void print_members(cmd *c)
 //Frees the memory allocated to store member information
 void free_members(cmd *c)
 {
-    //your implementation comes here
+    unsigned i;
+
+    free(c->init_cmd);
+
+    for(i = 0; i < c->nb_cmd_members; i++)
+        free(c->cmd_members[i]);
+
+    free(c->cmd_members);
 }
 
 //Prints the redirection information for member i
@@ -80,7 +97,21 @@ void print_redirection(cmd *c, int i)
 //Frees the memory allocated to store redirection info
 void free_redirection(cmd *c)
 {
-    //your implementation comes here
+    unsigned int i, j;
+
+    for(i = 0; i < c->nb_cmd_members; i++)
+    {
+        for(j = 0; j < 3; j++)
+        {
+            free(c->redirection[i][j]);
+        }
+
+        free(c->redirection[i]);
+        free(c->redirection_type[i]);
+    }
+
+    free(c->redirection);
+    free(c->redirection_type);
 }
 
 void parse_members_args(cmd *c)
@@ -129,6 +160,8 @@ void parse_members_args(cmd *c)
             nb_args++;
         }
 
+        c->nb_members_args[i] = nb_args;
+
         c->cmd_members_args[i] = (char **) malloc((nb_args + 1) * sizeof(char *));
         if(c->cmd_members_args == NULL)
         {
@@ -144,7 +177,6 @@ void parse_members_args(cmd *c)
             c->cmd_members_args[i][j+1] = strtok(NULL, sep);
             j++;
         }
-        c->nb_members_args[i] = j;
     }
 }
 

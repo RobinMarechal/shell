@@ -80,10 +80,15 @@ int main(int argc, char** argv)
 
 		robin_tests();
 
+
+		// FREES
+		free_members_args(cmd);
+		free_members(cmd);
+		free_redirection(cmd);
+
         //Execute the comand
         //Clean the house
         //..........
-
 	}
 	//..........
 	return 0;
