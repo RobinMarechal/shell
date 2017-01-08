@@ -96,7 +96,9 @@ void parse_members_args(cmd *c)
 
         char * member_without_flux = NULL;
         char * flux_start = NULL;
+        char * tmp = NULL;
         int j = 0;
+        int nb_args;
 
         // checking if there is a flux
         // if there is one, we take the str before it
@@ -111,10 +113,17 @@ void parse_members_args(cmd *c)
         }
         else
         {
-            member_without_flux = strdup(c->cmd_members[i]);
+            member_without_flux = trim(strdup(c->cmd_members[i]));
         }
 
-        c->cmd_members_args[i] = (char **) malloc(2 * sizeof(char *));
+        nb_args = 1;
+        tmp = member_without_flux;
+        while((tmp = strchr(tmp+1, ' ')) != NULL)
+        {
+            nb_args++;
+        }
+
+        c->cmd_members_args[i] = (char **) malloc((nb_args + 1) * sizeof(char *));
         if(c->cmd_members_args == NULL)
         {
             printf("ERROR: malloc()\n");
@@ -142,7 +151,7 @@ void parse_members(char *s, cmd *c)
     while ((pipe = strchr(s, '|')) != NULL)
     {
         // On saute l'espace de fin.
-        char * member = subString(s, pipe);
+        char * member = trim(subString(s, pipe));
 
         c->nb_cmd_members++;
 
@@ -180,7 +189,7 @@ void parse_members(char *s, cmd *c)
         exit(-1);
     }
 
-    strcpy(c->cmd_members[c->nb_cmd_members - 1], s);
+    strcpy(c->cmd_members[c->nb_cmd_members - 1], trim(s));
 }
 
 //Remplit les champs redir et type_redir

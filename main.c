@@ -7,6 +7,16 @@
 #include <unistd.h>
 #include "shell_fct.h"
 
+void gregoire_tests()
+{
+	// Mets tes tests ici
+}
+
+void robin_tests()
+{
+	// Je mets les miens ici
+}
+
 //To complete
 int main(int argc, char** argv)
 {
@@ -36,30 +46,39 @@ int main(int argc, char** argv)
         //Parse the comand
 
         // Initialisation of the command.
-        struct command * cmd;
+		struct command * cmd = (struct command *) malloc(sizeof(struct command));
 
         cmd->init_cmd = readlineptr;
         cmd->nb_cmd_members = 0;
         cmd->cmd_members = NULL;
         cmd->cmd_members_args = NULL;
         cmd->nb_members_args = NULL;
-        cmd->redirection = NULL;
-        cmd->redirection_type = NULL;
+        // cmd->redirection = NULL;
+        // cmd->redirection_type = NULL;
+		cmd->redirection = (char ***) malloc(cmd->nb_cmd_members * sizeof(char **));
+		cmd->redirection_type = (int **) malloc(cmd->nb_cmd_members * sizeof(int *));
 
+		// PARSE FUNCTIONS
+		printf("\n-----\nPARSE\n-----\n");
         parse_members(cmd->init_cmd, cmd);
-
 		parse_members_args(cmd);
+		for (i = 0; i < cmd->nb_cmd_members; i++)
+		{
+			parse_redirection(i, cmd);
+		}
+
+		// PRINT FUNCTIONS
+		printf("\n-----\nPRINT\n-----\n");
         print_members(cmd);
+		print_members_args(cmd);
+		for (i = 0; i < cmd->nb_cmd_members; i++)
+		{
+			print_redirection(cmd, i);
+		}
 
-        cmd->redirection = malloc(cmd->nb_cmd_members * sizeof(char **));
-        cmd->redirection_type = malloc(cmd->nb_cmd_members * sizeof(int *));
+		gregoire_tests();
 
-        for (i = 0; i < cmd->nb_cmd_members; i++)
-        {
-            parse_redirection(i, cmd);
-
-            print_redirection(cmd, i);
-        }
+		robin_tests();
 
         //Execute the comand
         //Clean the house
