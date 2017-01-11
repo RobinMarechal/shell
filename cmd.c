@@ -58,14 +58,14 @@ void print_members(cmd *c)
 //Frees the memory allocated to store member information
 void free_members(cmd *c)
 {
-    unsigned i;
-
-    free(c->init_cmd);
-
-    for(i = 0; i < c->nb_cmd_members; i++)
-        free(c->cmd_members[i]);
-
-    free(c->cmd_members);
+    // unsigned i;
+    //
+    // free(c->init_cmd);
+    //
+    // for(i = 0; i < c->nb_cmd_members; i++)
+    //     free(c->cmd_members[i]);
+    //
+    // free(c->cmd_members);
 }
 
 //Prints the redirection information for member i
@@ -97,21 +97,21 @@ void print_redirection(cmd *c, int i)
 //Frees the memory allocated to store redirection info
 void free_redirection(cmd *c)
 {
-    /*unsigned int i, j;
-
-    for(i = 0; i < c->nb_cmd_members; i++)
-    {
-        for(j = 0; j < 3; j++)
-        {
-            free(c->redirection[i][j]);
-        }
-
-        free(c->redirection[i]);
-        free(c->redirection_type[i]);
-    }
-
-    free(c->redirection);
-    free(c->redirection_type);*/
+    // unsigned int i, j;
+    //
+    // for(i = 0; i < c->nb_cmd_members; i++)
+    // {
+    //     for(j = 0; j < 3; j++)
+    //     {
+    //         free(c->redirection[i][j]);
+    //     }
+    //
+    //     free(c->redirection[i]);
+    //     free(c->redirection_type[i]);
+    // }
+    //
+    // free(c->redirection);
+    // free(c->redirection_type);
 }
 
 void parse_members_args(cmd *c)
@@ -130,7 +130,6 @@ void parse_members_args(cmd *c)
     // for every member
     for(i = 0; i < c->nb_cmd_members; i++)
     {
-
         char * member_without_flux = NULL;
         char * flux_start = NULL;
         char * tmp = NULL;
@@ -233,18 +232,18 @@ void parse_members(char *s, cmd *c)
 //Remplit les champs redir et type_redir
 void parse_redirection(unsigned int i, cmd *c)
 {
-    char * flux = NULL;
     int numberOfChevron = 0;
+    char * flux = NULL, * sub = NULL;
 
     size_t sizeOfMember = strlen(c->cmd_members[i]);
 
-    if ((c->redirection[i] = (char **) malloc(3 * sizeof(char *))) == NULL)
+    if ((c->redirection[i] = (char **) calloc(3, sizeof(char *))) == NULL)
     {
         printf("Error !");
         exit(-1);
     }
 
-    if ((c->redirection_type[i] = (int *) malloc(2 * sizeof(int))) == NULL)
+    if ((c->redirection_type[i] = (int *) calloc(2, sizeof(int))) == NULL)
     {
         printf("Error !");
         exit(-1);
@@ -261,11 +260,19 @@ void parse_redirection(unsigned int i, cmd *c)
 
     if ((flux = strchr(c->cmd_members[i], '<')) != NULL)
     {
-        flux = subString(flux + 1, flux + strlen(flux));
+        sub = subString(flux + 1, flux + strlen(flux));
+
+        strcpy(flux, sub);
+        free(sub);
 
         // Il peut y avoir un ou plusieurs chevrons.
         if (strchr(flux, '<') != NULL)
-            flux = subString(flux + 1, flux + strlen(flux));
+        {
+            sub = subString(flux + 1, flux + strlen(flux));
+
+            strcpy(flux, sub);
+            free(sub);
+        }
 
         if (strchr(flux, '<') != NULL)
         {
@@ -273,7 +280,10 @@ void parse_redirection(unsigned int i, cmd *c)
             exit(-1);
         }
 
-        flux = trim(flux);
+        sub = trim(flux);
+
+        strcpy(flux, sub);
+        free(sub);
 
         if ((c->redirection[i][0] = (char *) malloc(sizeOfMember * sizeof(char))) == NULL)
         {
@@ -282,10 +292,6 @@ void parse_redirection(unsigned int i, cmd *c)
         }
 
         strcpy(c->redirection[i][0], flux);
-
-        // STDOUT et STDERR mis à NULL;
-        c->redirection[i][1] = NULL;
-        c->redirection[i][2] = NULL;
     }
 
     // STDOUT.
@@ -293,12 +299,18 @@ void parse_redirection(unsigned int i, cmd *c)
     {
         numberOfChevron++;
 
-        flux = subString(flux + 1, flux + strlen(flux));
+        sub = subString(flux + 1, flux + strlen(flux));
+
+        strcpy(flux, sub);
+        free(sub);
 
         // Il peut y avoir un ou plusieurs chevrons.
         if (strchr(flux, '>') != NULL)
         {
-            flux = subString(flux + 1, flux + strlen(flux));
+            sub = subString(flux + 1, flux + strlen(flux));
+
+            strcpy(flux, sub);
+            free(sub);
 
             numberOfChevron++;
         }
@@ -309,7 +321,10 @@ void parse_redirection(unsigned int i, cmd *c)
             exit(-1);
         }
 
-        flux = trim(flux);
+        sub = trim(flux);
+
+        strcpy(flux, sub);
+        free(sub);
 
         if ((c->redirection[i][1] = (char *) malloc(sizeOfMember * sizeof(char))) == NULL)
         {
@@ -318,10 +333,6 @@ void parse_redirection(unsigned int i, cmd *c)
         }
 
         strcpy(c->redirection[i][1], flux);
-
-        // STDOUT et STDERR mis à NULL;
-        c->redirection[i][0] = NULL;
-        c->redirection[i][2] = NULL;
 
         // S'il y a plusieurs chevrons, la redirection est de type "APPEND".
         // Sinon, elle est de type "OVERRIDE".

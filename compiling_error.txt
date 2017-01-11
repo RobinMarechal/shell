@@ -1,0 +1,12 @@
+/tmp/ccDrwkcx.o: In function `main':
+main.c:(.text+0xbe): undefined reference to `readline'
+main.c:(.text+0x157): undefined reference to `parse_members'
+main.c:(.text+0x166): undefined reference to `parse_members_args'
+main.c:(.text+0x189): undefined reference to `parse_redirection'
+main.c:(.text+0x1b9): undefined reference to `print_members'
+main.c:(.text+0x1c8): undefined reference to `print_members_args'
+main.c:(.text+0x1eb): undefined reference to `print_redirection'
+main.c:(.text+0x225): undefined reference to `free_members_args'
+main.c:(.text+0x234): undefined reference to `free_members'
+main.c:(.text+0x243): undefined reference to `free_redirection'
+collect2: error: ld returned 1 exit status
