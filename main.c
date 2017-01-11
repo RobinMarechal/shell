@@ -46,34 +46,40 @@ int main(int argc, char** argv)
         //Parse the comand
 
         // Initialisation of the command.
-		struct command * cmd = (struct command *) malloc(sizeof(struct command));
+		// struct command * cmd = (struct command *) malloc(sizeof(struct command));
+		struct command cmd;
 
-        cmd->init_cmd = readlineptr;
-        cmd->nb_cmd_members = 0;
-        cmd->cmd_members = NULL;
-        cmd->cmd_members_args = NULL;
-        cmd->nb_members_args = NULL;
-        // cmd->redirection = NULL;
-        // cmd->redirection_type = NULL;
-		cmd->redirection = (char ***) malloc(cmd->nb_cmd_members * sizeof(char **));
-		cmd->redirection_type = (int **) malloc(cmd->nb_cmd_members * sizeof(int *));
+        cmd.init_cmd = readlineptr;
+        cmd.nb_cmd_members = 0;
+        cmd.cmd_members = NULL;
+        cmd.cmd_members_args = NULL;
+        cmd.nb_members_args = NULL;
+        // cmd.redirection = NULL;
+        // cmd.redirection_type = NULL;
 
 		// PARSE FUNCTIONS
 		printf("\n-----\nPARSE\n-----\n");
-        parse_members(cmd->init_cmd, cmd);
-		parse_members_args(cmd);
-		for (i = 0; i < cmd->nb_cmd_members; i++)
+        parse_members(cmd.init_cmd, &cmd);
+		parse_members_args(&cmd);
+
+		printf("\n\nNbmembers: %d\n", cmd.nb_cmd_members);
+
+		cmd.redirection = (char ***) malloc(cmd.nb_cmd_members * sizeof(char **));
+		cmd.redirection_type = (int **) malloc(cmd.nb_cmd_members * sizeof(int *));
+
+		for (i = 0; i < cmd.nb_cmd_members; i++)
 		{
-			parse_redirection(i, cmd);
+			parse_redirection(i, &cmd);
 		}
 
 		// PRINT FUNCTIONS
 		printf("\n-----\nPRINT\n-----\n");
-        print_members(cmd);
-		print_members_args(cmd);
-		for (i = 0; i < cmd->nb_cmd_members; i++)
+        print_members(&cmd);
+		print_members_args(&cmd);
+
+		for (i = 0; i < cmd.nb_cmd_members; i++)
 		{
-			print_redirection(cmd, i);
+			print_redirection(&cmd, i);
 		}
 
 		gregoire_tests();
@@ -82,9 +88,9 @@ int main(int argc, char** argv)
 
 
 		// FREES
-		free_members_args(cmd);
-		free_members(cmd);
-		free_redirection(cmd);
+		free_members_args(&cmd);
+		free_members(&cmd);
+		free_redirection(&cmd);
 
         //Execute the comand
         //Clean the house
