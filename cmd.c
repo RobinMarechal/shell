@@ -73,31 +73,31 @@ void print_redirection(cmd *c, int i)
 {
     int j;
 
-    printf("\n------- REDIRECTION ------- \n");
+    printf("------- REDIRECTION ------- \n");
 
     for (j = 0; j < 3; j++)
     {
         if (c->redirection[i][j] != NULL)
         {
-            printf("%s\n", c->redirection[i][j]);
+            printf("Member %d :\n%s\n", i, c->redirection[i][j]);
+
+            if (c->redirection_type[i][APPEND] == 1)
+                printf("La redirection est de type APPEND.\n", i);
+
+            else if (c->redirection_type[i][OVERRIDE] == 1)
+                printf("La redirection est de type OVERRIDE.\n", i);
 
             break;
         }
     }
 
-    printf("\n------- TYPE OF REDIRECTION ------- \n");
-
-    if (c->redirection_type[i][APPEND] == 1)
-        printf("La redirection du membre %d est de type APPEND.\n", i + 1);
-
-    else if (c->redirection_type[i][OVERRIDE] == 1)
-        printf("La redirection du membre %d est de type OVERRIDE.\n", i + 1);
+    printf("\n");
 }
 
 //Frees the memory allocated to store redirection info
 void free_redirection(cmd *c)
 {
-    unsigned int i, j;
+    /*unsigned int i, j;
 
     for(i = 0; i < c->nb_cmd_members; i++)
     {
@@ -111,7 +111,7 @@ void free_redirection(cmd *c)
     }
 
     free(c->redirection);
-    free(c->redirection_type);
+    free(c->redirection_type);*/
 }
 
 void parse_members_args(cmd *c)
@@ -264,8 +264,16 @@ void parse_redirection(unsigned int i, cmd *c)
         flux = subString(flux + 1, flux + strlen(flux));
 
         // Il peut y avoir un ou plusieurs chevrons.
-        while (strchr(flux, '<') != NULL)
+        if (strchr(flux, '<') != NULL)
             flux = subString(flux + 1, flux + strlen(flux));
+
+        if (strchr(flux, '<') != NULL)
+        {
+            printf("Error in the redirection type !\n");
+            exit(-1);
+        }
+
+        flux = trim(flux);
 
         if ((c->redirection[i][0] = (char *) malloc(sizeOfMember * sizeof(char))) == NULL)
         {
@@ -288,12 +296,20 @@ void parse_redirection(unsigned int i, cmd *c)
         flux = subString(flux + 1, flux + strlen(flux));
 
         // Il peut y avoir un ou plusieurs chevrons.
-         while (strchr(flux, '>') != NULL)
-         {
+        if (strchr(flux, '>') != NULL)
+        {
             flux = subString(flux + 1, flux + strlen(flux));
 
             numberOfChevron++;
-         }
+        }
+
+        if (strchr(flux, '>') != NULL)
+        {
+            printf("Error in the redirection type !\n");
+            exit(-1);
+        }
+
+        flux = trim(flux);
 
         if ((c->redirection[i][1] = (char *) malloc(sizeOfMember * sizeof(char))) == NULL)
         {
