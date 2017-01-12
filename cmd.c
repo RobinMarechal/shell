@@ -4,6 +4,18 @@
 #include <stdlib.h>
 //Your includes come here
 
+//Prints the contents of members to the console
+void print_members(cmd *c)
+{
+    unsigned int i = 0;
+    printf("------- MEMBERS ------- \n");
+    for (i = 0; i < c->nb_cmd_members; i++)
+    {
+        printf("-%s-\n", c->cmd_members[i]);
+    }
+    printf("\n");
+}
+
 //Prints the contents of members_args to the console
 void print_members_args(cmd *c)
 {
@@ -16,10 +28,10 @@ void print_members_args(cmd *c)
     {
         member_args = c->cmd_members_args[i];
         nb = c->nb_members_args[i];
-        printf("Member %d:\n", i);
+        printf("\nMember %d:\n", i);
         for (j = 0; j < nb; j++)
         {
-            printf("%s ", member_args[j]);
+            printf("  %d => %s\n", j, member_args[j]);
         }
         printf("\n");
     }
@@ -27,153 +39,146 @@ void print_members_args(cmd *c)
     printf("\n");
 }
 
-//Frees the memory allocated to store member arguments
-void free_members_args(cmd *c)
-{
-    // unsigned int i, j;
-    //
-    // for(i = 0; i < c->nb_cmd_members; i++)
-    // {
-    //     for(j = 0; j < c->nb_members_args[i]; i++)
-    //         free(c->cmd_members_args[i][j]);
-    //
-    //     free(c->cmd_members_args[i]);
-    // }
-    //
-    // free(c->cmd_members_args);
-}
-
-//Prints the contents of members to the console
-void print_members(cmd *c)
-{
-    unsigned int i = 0;
-    printf("------- MEMBERS ------- \n");
-    for (i = 0; i < c->nb_cmd_members; i++)
-    {
-        printf("%s\n", c->cmd_members[i]);
-    }
-    printf("\n");
-}
-
-//Frees the memory allocated to store member information
-void free_members(cmd *c)
-{
-    // unsigned i;
-    //
-    // free(c->init_cmd);
-    //
-    // for(i = 0; i < c->nb_cmd_members; i++)
-    //     free(c->cmd_members[i]);
-    //
-    // free(c->cmd_members);
-}
-
-//Prints the redirection information for member i
+//Prints the redirectio information for member i
 void print_redirection(cmd *c, int i)
 {
     int j;
 
-    printf("------- REDIRECTION ------- \n");
+    printf("\n------- REDIRECTION ------- \n");
 
     for (j = 0; j < 3; j++)
     {
         if (c->redirection[i][j] != NULL)
         {
-            printf("Member %d :\n%s\n", i, c->redirection[i][j]);
-
-            if (c->redirection_type[i][APPEND] == 1)
-                printf("La redirection est de type APPEND.\n", i);
-
-            else if (c->redirection_type[i][OVERRIDE] == 1)
-                printf("La redirection est de type OVERRIDE.\n", i);
+            printf("%s\n", c->redirection[i][j]);
 
             break;
         }
     }
 
-    printf("\n");
+    printf("\n------- TYPE OF REDIRECTION ------- \n");
+
+    if (c->redirection_type[i][APPEND] == 1)
+    printf("La redirection du membre %d est de type APPEND.\n", i + 1);
+
+    else if (c->redirection_type[i][OVERRIDE] == 1)
+    printf("La redirection du membre %d est de type OVERRIDE.\n", i + 1);
+}
+
+//Frees the memory allocated to store member information
+void free_members(cmd *c)
+{
+    unsigned int i;
+    free(c->init_cmd);
+    for (i = 0; i < c->nb_cmd_members; i++)
+    {
+        free(c->cmd_members[i]);
+    }
+}
+
+//Frees the memory allocated to store member arguments
+void free_members_args(cmd *c)
+{
+    unsigned int i, j;
+    for(i = 0; i < c->nb_cmd_members; i++)
+    {
+        for(j = 0; j < c->nb_members_args[i]; j++)
+        {
+            free(c->cmd_members_args[i][j]);
+        }
+
+        free(c->cmd_members_args[i]);
+    }
+
+    free(c->cmd_members_args);
+    free(c->nb_members_args);
 }
 
 //Frees the memory allocated to store redirection info
 void free_redirection(cmd *c)
 {
-    // unsigned int i, j;
-    //
-    // for(i = 0; i < c->nb_cmd_members; i++)
-    // {
-    //     for(j = 0; j < 3; j++)
-    //     {
-    //         free(c->redirection[i][j]);
-    //     }
-    //
-    //     free(c->redirection[i]);
-    //     free(c->redirection_type[i]);
-    // }
-    //
-    // free(c->redirection);
-    // free(c->redirection_type);
+    unsigned int i, j;
+
+    for(i = 0; i < c->nb_cmd_members; i++)
+    {
+        for(j = 0; j < 3; j++)
+        {
+            free(c->redirection[i][j]);
+        }
+
+        free(c->redirection[i]);
+        free(c->redirection_type[i]);
+    }
+
+    free(c->redirection);
+    free(c->redirection_type);
 }
 
 void parse_members_args(cmd *c)
 {
-    unsigned int i;
-    char sep[2] = " ";
+    // Initialisation
+    char member[256] = {0};
+    unsigned int i, j, k;
+    char is_space = 0, was_space = 0;
+    char * tok;
+    char space[2] = " ";
+    char * duplicate;
 
-    c->cmd_members_args = (char ***) malloc(c->nb_cmd_members * sizeof(char **));
-    c->nb_members_args = (unsigned int *) malloc(c->nb_cmd_members * sizeof(int));
-    if(c->cmd_members_args == NULL || c->nb_members_args == NULL)
-    {
-        printf("ERROR: malloc()\n");
-        exit(-1);
-    }
 
-    // for every member
+    // Allocate c->cmd_members_args && c->nb_members_args
+    if((c->cmd_members_args = (char ***) calloc(c->nb_cmd_members, sizeof(char **))) == NULL)
+        fatalError("Error: calloc() failed");
+
+
+    if((c->nb_members_args = (unsigned int *) calloc(c->nb_cmd_members, sizeof(unsigned int))) == NULL)
+        fatalError("Error: calloc() failed");
+
+
+    // For each member
     for(i = 0; i < c->nb_cmd_members; i++)
     {
-        char * member_without_flux = NULL;
-        char * flux_start = NULL;
-        char * tmp = NULL;
-        int j = 0;
-        int nb_args;
+        strcpy(member, c->cmd_members[i]);
+        c->nb_members_args[i] = 1;
 
-        // checking if there is a flux
-        // if there is one, we take the str before it
-        flux_start = strchr(c->cmd_members[i], '>');
-        if(flux_start == NULL)
+        // get the nb of args (without flux)
+        k = 0;
+        // while ther char is not the end OR the beginig of a flux (< || >)
+        while(member[k] != '\0')
         {
-            flux_start = strchr(c->cmd_members[i], '<');
-        }
-        if(flux_start != NULL)
-        {
-            member_without_flux = trim(subString(c->cmd_members[i], flux_start));
-        }
-        else
-        {
-            member_without_flux = trim(strdup(c->cmd_members[i]));
-        }
+            was_space = (member[k] == ' ');
+            k++;
+            is_space = (member[k] == ' ');
 
-        nb_args = 1;
-        tmp = member_without_flux;
-        while((tmp = strchr(tmp+1, ' ')) != NULL)
-        {
-            nb_args++;
+            if(is_space == 1 && was_space == 0)
+                c->nb_members_args[i]++;
+
+            if(member[k] == '<' || member[k] == '>')
+            {
+                c->nb_members_args[i]--;
+                break;
+            }
         }
 
-        c->nb_members_args[i] = nb_args;
 
-        c->cmd_members_args[i] = (char **) malloc((nb_args + 1) * sizeof(char *));
-        if(c->cmd_members_args == NULL)
+        // allocate c->cmd_members_args[i]
+        // malloc enough memory to insert an aditionnal NULL at the end of the array
+        if((c->cmd_members_args[i] = (char **) calloc(c->nb_members_args[i] + 1, sizeof(char *))) == NULL)
+            fatalError("Error: calloc() failed");
+
+
+        tok = strtok(member, space);
+        j = 0;
+
+        // For each member args
+        while(j < c->nb_members_args[i])
         {
-            printf("ERROR: malloc()\n");
-            exit(-1);
-        }
+            // add arg to c->cmd_members_args[i][j]
+            duplicate = strdup(tok);
+            c->cmd_members_args[i][j] = trim(duplicate);
+            free(duplicate);
 
-        // we split the args by cutting the str at spaces
-        c->cmd_members_args[i][0] = strtok(member_without_flux, sep);
-
-        while(c->cmd_members_args[i][j] != NULL)
-        {
-            c->cmd_members_args[i][j+1] = strtok(NULL, sep);
+            // get next arg
+            tok = strtok(NULL, space);
             j++;
         }
     }
@@ -182,51 +187,50 @@ void parse_members_args(cmd *c)
 //Remplit les champs initial_cmd, membres_cmd et nb_membres
 void parse_members(char *s, cmd *c)
 {
-    char * pipe = NULL;
+    // Initialisation
+    char str[256] = {0};
+    char * tok = NULL;
+    char * duplicate = NULL;
+    char delimiter[2] = "|";
+    unsigned int i = 0;
 
-    // Le cas où il y a plusieurs membres.
-    while ((pipe = strchr(s, '|')) != NULL)
+    strcpy(str, c->init_cmd);
+
+    // get the nb of members
+    while(str[i] != '\0')
     {
-        // On saute l'espace de fin.
-        char * member = trim(subString(s, pipe));
+        if(str[i] == *delimiter)
+            c->nb_cmd_members++;
 
-        c->nb_cmd_members++;
-
-        if ((c->cmd_members = (char **) realloc(c->cmd_members, c->nb_cmd_members * sizeof(char *))) == NULL)
-        {
-            printf("Error !");
-            exit(-1);
-        }
-
-        if ((c->cmd_members[c->nb_cmd_members - 1] = (char *) malloc(sizeof(char) * (strlen(member) + 1))) == NULL)
-        {
-            printf("Error !");
-            exit(-1);
-        }
-
-        strcpy(c->cmd_members[c->nb_cmd_members - 1], member);
-
-        // On saute l'espace de début.
-
-        s = pipe + 1;
+        i++;
     }
 
-    // Le cas où il n'y a qu'un membre ou s'il s'agit du dernier.
     c->nb_cmd_members++;
 
-    if ((c->cmd_members = (char **) realloc(c->cmd_members, c->nb_cmd_members * sizeof(char *))) == NULL)
-    {
-        printf("Error !");
-        exit(-1);
-    }
 
-    if ((c->cmd_members[c->nb_cmd_members - 1] = (char *) malloc(sizeof(char) * (strlen(s) + 1))) == NULL)
-    {
-        printf("Error !");
-        exit(-1);
-    }
+    // allocate data
+    // malloc enough memory to insert an aditionnal NULL at the end of the array
+    if((c->cmd_members = (char **) calloc(c->nb_cmd_members + 1, sizeof(char *))) == NULL)
+        fatalError("Error: calloc() failed");
 
-    strcpy(c->cmd_members[c->nb_cmd_members - 1], trim(s));
+    printf("\nSIZE: %d\n", c->nb_cmd_members);
+
+
+    // loop
+    tok = strtok(str, delimiter);
+    i = 0;
+
+    while(i < c->nb_cmd_members)
+    {
+        // add to c->cmd_members[i]
+        duplicate = strdup(tok);
+        c->cmd_members[i] = trim(duplicate);
+        free(duplicate);
+
+        // get next member
+        tok = strtok(NULL, delimiter);
+        i++;
+    }
 }
 
 //Remplit les champs redir et type_redir
@@ -351,8 +355,13 @@ void parse_redirection(unsigned int i, cmd *c)
     }
 }
 
-char * subString(const char * start, const char * end) {
-    char * str = (char *) malloc( (size_t) ( end - start + 1 ) );
+char * subString(const char * start, const char * end)
+{
+    char * str = (char *) malloc(( end - start + 1 ) * sizeof(char));
+
+    if(str == NULL)
+        fatalError("Error: malloc()\n");
+
     int i = 0;
     while(start+i != end && start[i] != '\0')
     {
@@ -366,19 +375,27 @@ char * subString(const char * start, const char * end) {
 
 char * trim(char * str)
 {
+    char * end;
+    int i = 0;
+
     if(str == NULL)
         return NULL;
 
-    char * end;
-
-    while(*str == ' ')
+    while(*(str+i) == ' ')
     {
-        str++;
+        i++;
     }
 
-    end = strchr(str, '\0');
+    end = strchr(str+i, '\0');
+
     while(*(end-1) == ' ')
         end--;
 
-    return subString(str, end);
+    return subString(str+i, end);
+}
+
+void fatalError(const char * msg)
+{
+    printf("\n%s\n", msg);
+    exit(-1);
 }

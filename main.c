@@ -31,7 +31,7 @@ int main(int argc, char** argv)
 	//..........
 	while(ret != MYSHELL_FCT_EXIT)
 	{
-	    int i;
+	    unsigned int i;
 
 		//Get your session info
         infos=getpwuid(getuid());
@@ -61,8 +61,6 @@ int main(int argc, char** argv)
 		printf("\n-----\nPARSE\n-----\n");
         parse_members(cmd.init_cmd, &cmd);
 		parse_members_args(&cmd);
-
-		printf("\n\nNbmembers: %d\n", cmd.nb_cmd_members);
 
 		cmd.redirection = (char ***) malloc(cmd.nb_cmd_members * sizeof(char **));
 		cmd.redirection_type = (int **) malloc(cmd.nb_cmd_members * sizeof(int *));

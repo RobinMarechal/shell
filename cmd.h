@@ -61,3 +61,5 @@ void parse_redirection(unsigned int i, cmd *c);
 char * trim(char * str);
 
 char * subString(const char * start, const char * end);
+
+void fatalError(const char * msg);
