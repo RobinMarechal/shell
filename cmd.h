@@ -44,6 +44,9 @@ void print_members_args(cmd *c);
 //Frees the memory allocated to store member arguments
 void free_members_args(cmd *c);
 
+// Prints the information of cmd
+void print_cmd(cmd * c);
+
 //Prints the contents of members to the console
 void print_members(cmd *c);
 
