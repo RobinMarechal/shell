@@ -59,10 +59,10 @@ void print_redirection(cmd *c, int i)
     printf("\n------- TYPE OF REDIRECTION ------- \n");
 
     if (c->redirection_type[i][APPEND] == 1)
-    printf("La redirection du membre %d est de type APPEND.\n", i + 1);
+        printf("La redirection du membre %d est de type APPEND.\n", i + 1);
 
     else if (c->redirection_type[i][OVERRIDE] == 1)
-    printf("La redirection du membre %d est de type OVERRIDE.\n", i + 1);
+        printf("La redirection du membre %d est de type OVERRIDE.\n", i + 1);
 }
 
 //Frees the memory allocated to store member information
