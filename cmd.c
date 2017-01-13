@@ -58,10 +58,10 @@ void print_redirection(cmd *c, int i)
 
     printf("\n------- TYPE OF REDIRECTION ------- \n");
 
-    if (c->redirection_type[i][APPEND] == 1)
+    if (c->redirection_type[i][STDOUT] == APPEND)
         printf("La redirection du membre %d est de type APPEND.\n", i + 1);
 
-    else if (c->redirection_type[i][OVERRIDE] == 1)
+    else if (c->redirection_type[i][STDOUT] == OVERRIDE)
         printf("La redirection du membre %d est de type OVERRIDE.\n", i + 1);
 }
 
@@ -174,6 +174,7 @@ void parse_members_args(cmd *c)
         {
             // add arg to c->cmd_members_args[i][j]
             duplicate = strdup(tok);
+            printf("\nDUPLICATE: -%s-", duplicate);
             c->cmd_members_args[i][j] = trim(duplicate);
             free(duplicate);
 
@@ -225,6 +226,7 @@ void parse_members(char *s, cmd *c)
         // add to c->cmd_members[i]
         duplicate = strdup(tok);
         c->cmd_members[i] = trim(duplicate);
+        printf("\nMEMBER: -%s-", c->cmd_members[i]);
         free(duplicate);
 
         // get next member
@@ -238,8 +240,10 @@ void parse_redirection(unsigned int i, cmd *c)
 {
     int numberOfChevron = 0;
     char * flux = NULL, * sub = NULL;
+    char member[256] = {0};
 
     size_t sizeOfMember = strlen(c->cmd_members[i]);
+    strcpy(member, c->cmd_members[i]);
 
     if ((c->redirection[i] = (char **) calloc(3, sizeof(char *))) == NULL)
     {
@@ -255,14 +259,17 @@ void parse_redirection(unsigned int i, cmd *c)
 
     // Initialisation des types de flux.
 
-    c->redirection_type[i][APPEND] = 0;
-    c->redirection_type[i][OVERRIDE] = 0;
+    c->redirection_type[i][STDIN] = -1;
+    c->redirection_type[i][STDOUT] = -1;
+    c->redirection_type[i][STDERR] = -1;
 
     // Recherche des flux.
 
     // STDIN.
 
-    if ((flux = strchr(c->cmd_members[i], '<')) != NULL)
+    printf("\nMEMBER(2): -%s-\n", c->cmd_members[i]);
+
+    if ((flux = strchr(member, '<')) != NULL)
     {
         sub = subString(flux + 1, flux + strlen(flux));
 
@@ -296,17 +303,20 @@ void parse_redirection(unsigned int i, cmd *c)
         }
 
         strcpy(c->redirection[i][0], flux);
+            printf("\nMEMBER(3): -%s-\n", c->cmd_members[i]);
     }
 
     // STDOUT.
-    else if ((flux = strchr(c->cmd_members[i], '>')) != NULL)
+    else if ((flux = strchr(member, '>')) != NULL)
     {
+        printf("\nMEMBER(4.0): -%s-\n", c->cmd_members[i]);
         numberOfChevron++;
 
         sub = subString(flux + 1, flux + strlen(flux));
 
         strcpy(flux, sub);
         free(sub);
+            printf("\nMEMBER(4.1): -%s-\n", c->cmd_members[i]);
 
         // Il peut y avoir un ou plusieurs chevrons.
         if (strchr(flux, '>') != NULL)
@@ -318,12 +328,14 @@ void parse_redirection(unsigned int i, cmd *c)
 
             numberOfChevron++;
         }
+            printf("\nMEMBER(4.2): -%s-\n", c->cmd_members[i]);
 
         if (strchr(flux, '>') != NULL)
         {
             printf("Error in the redirection type !\n");
             exit(-1);
         }
+            printf("\nMEMBER(4.3): -%s-\n", c->cmd_members[i]);
 
         sub = trim(flux);
 
@@ -335,24 +347,30 @@ void parse_redirection(unsigned int i, cmd *c)
             printf("Error !");
             exit(-1);
         }
+            printf("\nMEMBER(4.4): -%s-\n", c->cmd_members[i]);
 
         strcpy(c->redirection[i][1], flux);
+        c->redirection_type[i][STDOUT] = 1;
 
         // S'il y a plusieurs chevrons, la redirection est de type "APPEND".
         // Sinon, elle est de type "OVERRIDE".
+            printf("\nMEMBER(4.5): -%s-\n", c->cmd_members[i]);
 
         if (numberOfChevron > 1)
         {
-            c->redirection_type[i][APPEND] = 1;
-            c->redirection_type[i][OVERRIDE] = 0;
+            c->redirection_type[i][STDOUT] = APPEND;
         }
-
         else
         {
-            c->redirection_type[i][APPEND] = 0;
-            c->redirection_type[i][OVERRIDE] = 1;
+            c->redirection_type[i][STDOUT] = OVERRIDE;
         }
+            printf("\nMEMBER(4): -%s-\n", c->cmd_members[i]);
     }
+    else
+    {
+        c->redirection_type[i][STDERR] = 1;
+    }
+        printf("\nMEMBER(2): -%s-\n", c->cmd_members[i]);
 }
 
 char * subString(const char * start, const char * end)

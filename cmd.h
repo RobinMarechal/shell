@@ -1,7 +1,7 @@
 //Command is well-formed
 #define MYSHELL_CMD_OK 0
 
-typedef struct command
+typedef struct _command
 {
     //the command originally inputed by the user
     char *init_cmd;
@@ -25,10 +25,17 @@ typedef struct command
     int **redirection_type;
 } cmd;
 
-enum type
+enum _type
 {
     APPEND,
     OVERRIDE
+};
+
+enum _redirection
+{
+    STDIN,
+    STDOUT,
+    STDERR
 };
 
 //Prints the contents of members_args to the console
