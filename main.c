@@ -47,7 +47,7 @@ int main(int argc, char** argv)
 
         // Initialisation of the command.
 		// struct command * cmd = (struct command *) malloc(sizeof(struct command));
-		struct command cmd;
+		struct _command cmd;
 
         cmd.init_cmd = readlineptr;
         cmd.nb_cmd_members = 0;
@@ -58,7 +58,6 @@ int main(int argc, char** argv)
         // cmd.redirection_type = NULL;
 
 		// PARSE FUNCTIONS
-		printf("\n-----\nPARSE\n-----\n");
         parse_members(cmd.init_cmd, &cmd);
 		parse_members_args(&cmd);
 
@@ -71,14 +70,7 @@ int main(int argc, char** argv)
 		}
 
 		// PRINT FUNCTIONS
-		printf("\n-----\nPRINT\n-----\n");
-        print_members(&cmd);
-		print_members_args(&cmd);
-
-		for (i = 0; i < cmd.nb_cmd_members; i++)
-		{
-			print_redirection(&cmd, i);
-		}
+		print_cmd(&cmd);
 
 		gregoire_tests();
 

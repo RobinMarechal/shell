@@ -4,16 +4,33 @@
 #include <stdlib.h>
 //Your includes come here
 
+// Prints the information of cmd
+void print_cmd(cmd * c)
+{
+    unsigned int i;
+
+    printf("\ninit_cmd = \"%s\"\n", c->init_cmd);
+
+    print_members(c);
+    print_members_args(c);
+
+    for (i = 0; i < c->nb_cmd_members; i++)
+    {
+        print_redirection(c, i);
+    }
+}
+
 //Prints the contents of members to the console
 void print_members(cmd *c)
 {
     unsigned int i = 0;
-    printf("------- MEMBERS ------- \n");
+
+    printf("nb_cmd_members = %d\n", c->nb_cmd_members);
+
     for (i = 0; i < c->nb_cmd_members; i++)
     {
-        printf("-%s-\n", c->cmd_members[i]);
+        printf("cmd_members[%d] = %s\n", i, c->cmd_members[i]);
     }
-    printf("\n");
 }
 
 //Prints the contents of members_args to the console
@@ -22,47 +39,63 @@ void print_members_args(cmd *c)
     unsigned int i, j, nb;
     char ** member_args;
 
-    printf("------- ARGS ------- \n");
+    for( i = 0; i < c->nb_cmd_members; i++)
+    {
+        printf("nb_members_args[%d] = %d\n", i, c->nb_members_args[i]);
+    }
 
     for (i = 0; i < c->nb_cmd_members; i++)
     {
         member_args = c->cmd_members_args[i];
         nb = c->nb_members_args[i];
-        printf("\nMember %d:\n", i);
         for (j = 0; j < nb; j++)
         {
-            printf("  %d => %s\n", j, member_args[j]);
+            printf("cmd_members_args[%d][%d] = %s\n", i, j, member_args[j]);
         }
-        printf("\n");
     }
-
-    printf("\n");
 }
 
 //Prints the redirectio information for member i
 void print_redirection(cmd *c, int i)
 {
-    int j;
-
-    printf("\n------- REDIRECTION ------- \n");
-
-    for (j = 0; j < 3; j++)
+    // STDIN
+    if (c->redirection[i][STDIN] != NULL)
     {
-        if (c->redirection[i][j] != NULL)
-        {
-            printf("%s\n", c->redirection[i][j]);
-
-            break;
-        }
+        printf("redirection[%d][STDIN] = %s\n", i, c->redirection[i][STDIN]);
+    }
+    else
+    {
+        printf("redirection[%d][STDIN] = NULL\n", i);
     }
 
-    printf("\n------- TYPE OF REDIRECTION ------- \n");
+    // STDOUT
+    if (c->redirection[i][STDOUT] != NULL)
+    {
+        printf("redirection[%d][STDOUT] = %s\n", i, c->redirection[i][STDOUT]);
+    }
+    else
+    {
+        printf("redirection[%d][STDOUT] = NULL\n", i);
+    }
+
+    // STDERR
+    if (c->redirection[i][STDERR] != NULL)
+    {
+        printf("redirection[%d][STDERR] = %s\n", i, c->redirection[i][STDERR]);
+    }
+    else
+    {
+        printf("redirection[%d][STDERR] = NULL\n", i);
+    }
 
     if (c->redirection_type[i][STDOUT] == APPEND)
-        printf("La redirection du membre %d est de type APPEND.\n", i + 1);
-
+    {
+        printf("redirection_type[%d][STDOUT] = APPEND\n", i);
+    }
     else if (c->redirection_type[i][STDOUT] == OVERRIDE)
-        printf("La redirection du membre %d est de type OVERRIDE.\n", i + 1);
+    {
+        printf("redirection_type[%d][STDOUT] = OVERRIDE\n", i);
+    }
 }
 
 //Frees the memory allocated to store member information
@@ -174,7 +207,6 @@ void parse_members_args(cmd *c)
         {
             // add arg to c->cmd_members_args[i][j]
             duplicate = strdup(tok);
-            printf("\nDUPLICATE: -%s-", duplicate);
             c->cmd_members_args[i][j] = trim(duplicate);
             free(duplicate);
 
@@ -214,7 +246,6 @@ void parse_members(char *s, cmd *c)
     if((c->cmd_members = (char **) calloc(c->nb_cmd_members + 1, sizeof(char *))) == NULL)
         fatalError("Error: calloc() failed");
 
-    printf("\nSIZE: %d\n", c->nb_cmd_members);
 
 
     // loop
@@ -226,7 +257,6 @@ void parse_members(char *s, cmd *c)
         // add to c->cmd_members[i]
         duplicate = strdup(tok);
         c->cmd_members[i] = trim(duplicate);
-        printf("\nMEMBER: -%s-", c->cmd_members[i]);
         free(duplicate);
 
         // get next member
@@ -247,14 +277,12 @@ void parse_redirection(unsigned int i, cmd *c)
 
     if ((c->redirection[i] = (char **) calloc(3, sizeof(char *))) == NULL)
     {
-        printf("Error !");
-        exit(-1);
+        fatalError("Error: calloc()");
     }
 
-    if ((c->redirection_type[i] = (int *) calloc(2, sizeof(int))) == NULL)
+    if ((c->redirection_type[i] = (int *) calloc(3, sizeof(int))) == NULL)
     {
-        printf("Error !");
-        exit(-1);
+        fatalError("Error: calloc()");
     }
 
     // Initialisation des types de flux.
@@ -266,9 +294,6 @@ void parse_redirection(unsigned int i, cmd *c)
     // Recherche des flux.
 
     // STDIN.
-
-    printf("\nMEMBER(2): -%s-\n", c->cmd_members[i]);
-
     if ((flux = strchr(member, '<')) != NULL)
     {
         sub = subString(flux + 1, flux + strlen(flux));
@@ -287,8 +312,7 @@ void parse_redirection(unsigned int i, cmd *c)
 
         if (strchr(flux, '<') != NULL)
         {
-            printf("Error in the redirection type !\n");
-            exit(-1);
+            fatalError("Error in the redirection type !");
         }
 
         sub = trim(flux);
@@ -298,25 +322,21 @@ void parse_redirection(unsigned int i, cmd *c)
 
         if ((c->redirection[i][0] = (char *) malloc(sizeOfMember * sizeof(char))) == NULL)
         {
-            printf("Error !");
-            exit(-1);
+            fatalError("Error: malloc()");
         }
 
         strcpy(c->redirection[i][0], flux);
-            printf("\nMEMBER(3): -%s-\n", c->cmd_members[i]);
     }
 
     // STDOUT.
     else if ((flux = strchr(member, '>')) != NULL)
     {
-        printf("\nMEMBER(4.0): -%s-\n", c->cmd_members[i]);
         numberOfChevron++;
 
         sub = subString(flux + 1, flux + strlen(flux));
 
         strcpy(flux, sub);
         free(sub);
-            printf("\nMEMBER(4.1): -%s-\n", c->cmd_members[i]);
 
         // Il peut y avoir un ou plusieurs chevrons.
         if (strchr(flux, '>') != NULL)
@@ -328,14 +348,11 @@ void parse_redirection(unsigned int i, cmd *c)
 
             numberOfChevron++;
         }
-            printf("\nMEMBER(4.2): -%s-\n", c->cmd_members[i]);
 
         if (strchr(flux, '>') != NULL)
         {
-            printf("Error in the redirection type !\n");
-            exit(-1);
+            fatalError("Error in the redirection type !");
         }
-            printf("\nMEMBER(4.3): -%s-\n", c->cmd_members[i]);
 
         sub = trim(flux);
 
@@ -344,17 +361,15 @@ void parse_redirection(unsigned int i, cmd *c)
 
         if ((c->redirection[i][1] = (char *) malloc(sizeOfMember * sizeof(char))) == NULL)
         {
-            printf("Error !");
-            exit(-1);
+            fatalError("Error: malloc()");
+
         }
-            printf("\nMEMBER(4.4): -%s-\n", c->cmd_members[i]);
 
         strcpy(c->redirection[i][1], flux);
         c->redirection_type[i][STDOUT] = 1;
 
         // S'il y a plusieurs chevrons, la redirection est de type "APPEND".
         // Sinon, elle est de type "OVERRIDE".
-            printf("\nMEMBER(4.5): -%s-\n", c->cmd_members[i]);
 
         if (numberOfChevron > 1)
         {
@@ -364,13 +379,11 @@ void parse_redirection(unsigned int i, cmd *c)
         {
             c->redirection_type[i][STDOUT] = OVERRIDE;
         }
-            printf("\nMEMBER(4): -%s-\n", c->cmd_members[i]);
     }
     else
     {
         c->redirection_type[i][STDERR] = 1;
     }
-        printf("\nMEMBER(2): -%s-\n", c->cmd_members[i]);
 }
 
 char * subString(const char * start, const char * end)
