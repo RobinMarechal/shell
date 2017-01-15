@@ -4,8 +4,11 @@ EXEC=myshell
 all:$(EXEC)
 CCFLAGS=-g -Wall
 
-$(EXEC): main.o cmd.o shell_fct.o
-	gcc $(CCFLAGS) -o  $(EXEC) main.o cmd.o shell_fct.o $(LIBS)
+$(EXEC): main.o cmd.o shell_fct.o helpers.o
+	gcc $(CCFLAGS) -o  $(EXEC) main.o cmd.o shell_fct.o helpers.o $(LIBS)
+
+helpers.o: helpers.c
+	$(CC) $(CCFLAGS) -o helpers.o -c helpers.c
 
 cmd.o: cmd.c
 	$(CC)  $(CCFLAGS) -o cmd.o -c cmd.c

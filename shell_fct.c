@@ -8,40 +8,43 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <sys/wait.h>
+#include <string.h>
+#include "helpers.h"
 
-int exec_command(cmd* my_cmd)
+int exec_command(cmd* c)
 {
     char ** path = NULL;
 
     pid_t * pid = NULL;
-    int ** tube = NULL, i;
+    int ** tube = NULL;
     int * status = NULL;
+    unsigned int i;
 
     char buffer[20] = {0};
 
     // Initialiation des pipes.
 
-    if ((tube = malloc(sizeof(int *) * my_cmd->nb_cmd_members)) == NULL)
+    if ((tube = (int **) malloc(sizeof(int *) * c->nb_cmd_members)) == NULL)
         fatalError("Error in main.c !\n");
 
-    for (i = 0; i < my_cmd->nb_cmd_members; i++)
+    for (i = 0; i < c->nb_cmd_members; i++)
     {
-        if ((tube[i] = malloc(sizeof(int) * 2)) == NULL)
+        if ((tube[i] = (int *) malloc(sizeof(int) * 2)) == NULL)
             fatalError("Error in main.c !\n");
     }
 
-    if ((status = malloc(sizeof(int) * my_cmd->nb_cmd_members)) == NULL)
+    if ((status = (int *) malloc(sizeof(int) * c->nb_cmd_members)) == NULL)
         fatalError("Error in main.c !\n");
 
     // Initialisation des pid.
 
-    if ((pid = malloc(sizeof(pid_t) * my_cmd->nb_cmd_members)) == NULL)
+    if ((pid = (pid_t *) malloc(sizeof(pid_t) * c->nb_cmd_members)) == NULL)
         fatalError("Error in main.c !\n");
 
-    if ((path = malloc(sizeof(char *) * my_cmd->nb_cmd_members)) == NULL)
+    if ((path = (char  **) malloc(sizeof(char *) * c->nb_cmd_members)) == NULL)
         fatalError("Error in main.c !\n");
 
-    for (i = 0; i < my_cmd->nb_cmd_members; i++)
+    for (i = 0; i < c->nb_cmd_members; i++)
     {
         pipe(tube[i]);
 
@@ -67,22 +70,22 @@ int exec_command(cmd* my_cmd)
             dup2(tube[i][1], 1);
             close(tube[i][1]);
 
-            if ((path[i] = malloc(sizeof(char) * (strlen(my_cmd->cmd_members_args[i][0]) + 1))) == NULL)
+            if ((path[i] = (char *) malloc(sizeof(char) * (strlen(c->cmd_members_args[i][0]) + 1))) == NULL)
                 fatalError("Error in main.c !\n");
 
-            sprintf(path[i], "/bin/%s", my_cmd->cmd_members_args[i][0]);
+            sprintf(path[i], "/bin/%s", c->cmd_members_args[i][0]);
 
-            /*my_cmd->cmd_members_args[i] = realloc(my_cmd->cmd_members_args[i], my_cmd->nb_members_args[i] + 1);
+            /*c->cmd_members_args[i] = realloc(c->cmd_members_args[i], c->nb_members_args[i] + 1);
 
-            my_cmd->nb_members_args[i]++;
+            c->nb_members_args[i]++;
 
-            my_cmd->cmd_members_args[i][my_cmd->nb_members_args[i]] = NULL;*/
+            c->cmd_members_args[i][c->nb_members_args[i]] = NULL;*/
 
             /*    int j;
-            for (j = 0; j < my_cmd->nb_members_args[i]; j++)
-                printf("\n%s\n\n", my_cmd->cmd_members_args[i][j]);*/
+            for (j = 0; j < c->nb_members_args[i]; j++)
+                printf("\n%s\n\n", c->cmd_members_args[i][j]);*/
 
-            if (execvp(path[i], my_cmd->cmd_members_args[i]) == -1)
+            if (execvp(path[i], c->cmd_members_args[i]) == -1)
             {
                 perror("execlp");
                 exit(errno);
@@ -90,36 +93,33 @@ int exec_command(cmd* my_cmd)
         }
     }
 
-    for (i = 0; i < my_cmd->nb_cmd_members - 1; i++)
+    for (i = 0; i < c->nb_cmd_members - 1; i++)
     {
         close(tube[i][0]);
         close(tube[i][1]);
     }
 
-    close(tube[my_cmd->nb_cmd_members - 1][1]);
-    dup2(tube[my_cmd->nb_cmd_members - 1][0], 0);
-    close(tube[my_cmd->nb_cmd_members - 1][0]);
+    close(tube[c->nb_cmd_members - 1][1]);
+    dup2(tube[c->nb_cmd_members - 1][0], 0);
+    close(tube[c->nb_cmd_members - 1][0]);
 
-    for (i = 0; i < my_cmd->nb_cmd_members; i++)
+    for (i = 0; i < c->nb_cmd_members; i++)
         waitpid(pid[i], &status[i], 0);
 
     while(fgets(buffer, 20, stdin) != NULL)
         printf("%s", buffer);
 
-    for (i = 0; i < my_cmd->nb_cmd_members; i++)
+    for (i = 0; i < c->nb_cmd_members; i++)
         free(path[i]);
 
     free(path);
 
     free(pid);
 
-    for (i = 0; i < my_cmd->nb_cmd_members; i++)
+    for (i = 0; i < c->nb_cmd_members; i++)
         free(tube[i]);
 
     free(tube);
-
-    for (i = 0; i < my_cmd->nb_cmd_members; i++)
-        free(status[i]);
 
     free(status);
 
