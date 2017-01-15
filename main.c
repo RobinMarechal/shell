@@ -7,9 +7,9 @@
 #include <unistd.h>
 #include "shell_fct.h"
 
-void gregoire_tests()
+void gregoire_tests(cmd * c)
 {
-	// Mets tes tests ici
+	exec_command(c);
 }
 
 void robin_tests()
@@ -72,7 +72,7 @@ int main(int argc, char** argv)
 		// PRINT FUNCTIONS
 		print_cmd(&cmd);
 
-		gregoire_tests();
+		gregoire_tests(&cmd);
 
 		robin_tests();
 
