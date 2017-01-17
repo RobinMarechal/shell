@@ -39,6 +39,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="cmd.h" />
+		<Unit filename="helpers.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="helpers.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include "shell_fct.h"
+#include "helpers.h"
 
 void gregoire_tests(cmd * c)
 {
@@ -60,6 +61,9 @@ int main(int argc, char** argv)
 
 		cmd.redirection = (char ***) malloc(cmd.nb_cmd_members * sizeof(char **));
 		cmd.redirection_type = (int **) malloc(cmd.nb_cmd_members * sizeof(int *));
+
+		if( cmd.redirection == NULL || cmd.redirection_type == NULL)
+			fatalError("Error: malloc()");
 
 		for (i = 0; i < cmd.nb_cmd_members; i++)
 		{

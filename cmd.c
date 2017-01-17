@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "helpers.h"
 //Your includes come here
 
 // Prints the information of cmd
@@ -162,10 +163,8 @@ void parse_members_args(cmd *c)
     if((c->cmd_members_args = (char ***) calloc(c->nb_cmd_members, sizeof(char **))) == NULL)
         fatalError("Error: calloc() failed");
 
-
     if((c->nb_members_args = (unsigned int *) calloc(c->nb_cmd_members, sizeof(unsigned int))) == NULL)
         fatalError("Error: calloc() failed");
-
 
     // For each member
     for(i = 0; i < c->nb_cmd_members; i++)
@@ -385,49 +384,4 @@ void parse_redirection(unsigned int i, cmd *c)
     {
         c->redirection_type[i][STDERR] = 1;
     }
-}
-
-char * subString(const char * start, const char * end)
-{
-    char * str = (char *) malloc(( end - start + 1 ) * sizeof(char));
-
-    if(str == NULL)
-        fatalError("Error: malloc()\n");
-
-    int i = 0;
-    while(start+i != end && start[i] != '\0')
-    {
-        str[i] = start[i];
-        i++;
-    }
-    str[i] = '\0';
-
-    return str;
-}
-
-char * trim(char * str)
-{
-    char * end;
-    int i = 0;
-
-    if(str == NULL)
-        return NULL;
-
-    while(*(str+i) == ' ')
-    {
-        i++;
-    }
-
-    end = strchr(str+i, '\0');
-
-    while(*(end-1) == ' ')
-        end--;
-
-    return subString(str+i, end);
-}
-
-void fatalError(const char * msg)
-{
-    printf("\n%s\n", msg);
-    exit(-1);
 }
