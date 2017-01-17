@@ -22,13 +22,13 @@ int main(int argc, char** argv)
 {
 	//..........
 	int ret = MYSHELL_CMD_OK;
+
 	char* readlineptr;
 	struct passwd* infos;
-	char str[1024];
 	char hostname[256];
+	char str[1024];
 	char workingdirectory[256];
 
-	//..........
 	while(ret != MYSHELL_FCT_EXIT)
 	{
 	    unsigned int i;
@@ -37,16 +37,15 @@ int main(int argc, char** argv)
         infos=getpwuid(getuid());
 		gethostname(hostname, 256);
 		getcwd(workingdirectory, 256);
+
         //Print it to the console
 		sprintf(str, "\n{myshell}%s@%s:%s$ ", infos->pw_name, hostname, workingdirectory);
-		readlineptr = readline(str);
 
-        //Your code goes here.......
+		readlineptr = readline(str);
 
         //Parse the comand
 
         // Initialisation of the command.
-		// struct command * cmd = (struct command *) malloc(sizeof(struct command));
 		struct _command cmd;
 
         cmd.init_cmd = readlineptr;
@@ -54,8 +53,6 @@ int main(int argc, char** argv)
         cmd.cmd_members = NULL;
         cmd.cmd_members_args = NULL;
         cmd.nb_members_args = NULL;
-        // cmd.redirection = NULL;
-        // cmd.redirection_type = NULL;
 
 		// PARSE FUNCTIONS
         parse_members(cmd.init_cmd, &cmd);
@@ -76,16 +73,11 @@ int main(int argc, char** argv)
 
 		robin_tests();
 
-
 		// FREES
 		free_members_args(&cmd);
 		free_members(&cmd);
 		free_redirection(&cmd);
-
-        //Execute the comand
-        //Clean the house
-        //..........
 	}
-	//..........
+
 	return 0;
 }

@@ -67,22 +67,13 @@ int exec_command(cmd* my_cmd)
             dup2(tube[i][1], 1);
             close(tube[i][1]);
 
-            if ((path[i] = malloc(sizeof(char) * (strlen(my_cmd->cmd_members_args[i][0]) + 1))) == NULL)
-                fatalError("Error in main.c !\n");
-
-            sprintf(path[i], "/bin/%s", my_cmd->cmd_members_args[i][0]);
-
-            /*my_cmd->cmd_members_args[i] = realloc(my_cmd->cmd_members_args[i], my_cmd->nb_members_args[i] + 1);
+            my_cmd->cmd_members_args[i] = realloc(my_cmd->cmd_members_args[i], my_cmd->nb_members_args[i] + 1);
 
             my_cmd->nb_members_args[i]++;
 
-            my_cmd->cmd_members_args[i][my_cmd->nb_members_args[i]] = NULL;*/
+            my_cmd->cmd_members_args[i][my_cmd->nb_members_args[i]] = NULL;
 
-            /*    int j;
-            for (j = 0; j < my_cmd->nb_members_args[i]; j++)
-                printf("\n%s\n\n", my_cmd->cmd_members_args[i][j]);*/
-
-            if (execvp(path[i], my_cmd->cmd_members_args[i]) == -1)
+            if (execvp(my_cmd->cmd_members_args[i][0], my_cmd->cmd_members_args[i]) == -1)
             {
                 perror("execlp");
                 exit(errno);

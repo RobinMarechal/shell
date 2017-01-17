@@ -227,6 +227,7 @@ void parse_members(char *s, cmd *c)
     char delimiter[2] = "|";
     unsigned int i = 0;
 
+    //printf("\n%s\n", c->init_cmd);
     strcpy(str, c->init_cmd);
 
     // get the nb of members
