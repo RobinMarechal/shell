@@ -81,6 +81,8 @@ int main(int argc, char** argv)
 		free_members_args(&cmd);
 		free_members(&cmd);
 		free_redirection(&cmd);
+
+		free(readlineptr);
 	}
 
 	return 0;

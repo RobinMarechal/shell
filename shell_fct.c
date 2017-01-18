@@ -11,7 +11,33 @@
 #include <string.h>
 #include "helpers.h"
 
-int exec_command(cmd* c)
+void exec_redirection_out(cmd * c, int i)
+{
+    if (c->redirection_type[i][STDOUT] == APPEND)
+    {
+        // S_IRUSR : permission de lecture.
+        // S_IWUSR : permission d'écriture.
+
+        int fd0 = open(c->redirection[i][STDOUT], O_RDWR | O_APPEND | S_IRUSR | S_IWUSR);
+        dup2(fd0, STDOUT_FILENO);
+        close(fd0);
+    }
+
+    // Redirection de type OVERRIDE.
+
+    if (c->redirection_type[i][STDOUT] == OVERRIDE)
+    {
+        // S_IRUSR : permission de lecture.
+        // S_IWUSR : permission d'écriture.
+
+        int fd0 = creat(c->redirection[i][STDOUT], O_RDWR | S_IRUSR | S_IWUSR);
+        dup2(fd0, STDOUT_FILENO);
+        close(fd0);
+    }
+}
+
+
+int exec_command(cmd * c)
 {
     pid_t * pid = NULL;
     int ** tube = NULL;
@@ -70,6 +96,10 @@ int exec_command(cmd* c)
             c->nb_members_args[i]++;
 
             c->cmd_members_args[i][c->nb_members_args[i]] = NULL;
+
+            // Exécution des redirections.
+
+            exec_redirection_out(c, i);
 
             if (execvp(c->cmd_members_args[i][0], c->cmd_members_args[i]) == -1)
             {
