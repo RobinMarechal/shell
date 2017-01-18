@@ -11,6 +11,24 @@
 #include <string.h>
 #include "helpers.h"
 
+void exec_redirection_in(cmd * c, int i)
+{
+    if (c->redirection_type[i][STDIN] == RFILE)
+    {
+        int fd0 = open(c->redirection[i][STDIN], O_RDONLY);
+        dup2(fd0, STDIN_FILENO);
+        close(fd0);
+    }
+
+    /*else if (c->redirection_type[i][STDIN] == KEYBOARD)
+    {
+        int fd0 = open(c->redirection[i][STDIN], O_WRONLY | S_IWUSR);
+        dup2(fd0, STDIN_FILENO);
+        close(fd0);
+    }*/
+}
+
+
 void exec_redirection_out(cmd * c, int i)
 {
     if (c->redirection_type[i][STDOUT] == APPEND)
@@ -25,7 +43,7 @@ void exec_redirection_out(cmd * c, int i)
 
     // Redirection de type OVERRIDE.
 
-    if (c->redirection_type[i][STDOUT] == OVERRIDE)
+    else if (c->redirection_type[i][STDOUT] == OVERRIDE)
     {
         // S_IRUSR : permission de lecture.
         // S_IWUSR : permission d'écriture.
@@ -100,6 +118,8 @@ int exec_command(cmd * c)
             // Exécution des redirections.
 
             exec_redirection_out(c, i);
+
+            exec_redirection_in(c, i);
 
             if (execvp(c->cmd_members_args[i][0], c->cmd_members_args[i]) == -1)
             {

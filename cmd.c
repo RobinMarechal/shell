@@ -296,6 +296,8 @@ void parse_redirection(unsigned int i, cmd *c)
     // STDIN.
     if ((flux = strchr(member, '<')) != NULL)
     {
+        numberOfChevron++;
+
         sub = subString(flux + 1, flux + strlen(flux));
 
         strcpy(flux, sub);
@@ -308,6 +310,8 @@ void parse_redirection(unsigned int i, cmd *c)
 
             strcpy(flux, sub);
             free(sub);
+
+            numberOfChevron++;
         }
 
         if (strchr(flux, '<') != NULL)
@@ -326,6 +330,18 @@ void parse_redirection(unsigned int i, cmd *c)
         }
 
         strcpy(c->redirection[i][0], flux);
+
+        // S'il y a plusieurs chevrons, la redirection est de type "CLAVIER".
+        // Sinon, elle est de type "FILE".
+
+        if (numberOfChevron > 1)
+        {
+            c->redirection_type[i][STDIN] = KEYBOARD;
+        }
+        else
+        {
+            c->redirection_type[i][STDIN] = RFILE;
+        }
     }
 
     // STDOUT.

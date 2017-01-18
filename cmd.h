@@ -28,7 +28,9 @@ typedef struct _command
 enum _type
 {
     APPEND,
-    OVERRIDE
+    OVERRIDE,
+    RFILE,
+    KEYBOARD
 };
 
 enum _redirection
