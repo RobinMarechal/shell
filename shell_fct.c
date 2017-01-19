@@ -11,7 +11,57 @@
 #include <string.h>
 #include "helpers.h"
 
-int exec_command(cmd* c)
+void exec_redirection_in(cmd * c, int i)
+{
+    if (c->redirection_type[i][STDIN] == RFILE)
+    {
+        int fd = open(c->redirection[i][STDIN], O_RDONLY);
+        dup2(fd, STDIN_FILENO);
+        close(fd);
+    }
+
+    /*else if (c->redirection_type[i][STDIN] == KEYBOARD)
+    {
+        int fd = open(c->redirection[i][STDIN], O_WRONLY | S_IWUSR);
+        dup2(fd, STDIN_FILENO);
+        close(fd);
+    }*/
+}
+
+
+void exec_redirection_out(cmd * c, int i)
+{
+    if (c->redirection_type[i][STDOUT] == APPEND)
+    {
+        // S_IRUSR : permission de lecture.
+        // S_IWUSR : permission d'écriture.
+
+        int fd = open(c->redirection[i][STDOUT], O_RDWR | O_APPEND | S_IRUSR | S_IWUSR);
+
+        // Si le fichier n'existe pas, on le crée.
+
+        if (fd == -1)
+            fd = creat(c->redirection[i][STDOUT], O_RDWR | S_IRUSR | S_IWUSR);
+
+        dup2(fd, STDOUT_FILENO);
+        close(fd);
+    }
+
+    // Redirection de type OVERRIDE.
+
+    else if (c->redirection_type[i][STDOUT] == OVERRIDE)
+    {
+        // S_IRUSR : permission de lecture.
+        // S_IWUSR : permission d'écriture.
+
+        int fd = creat(c->redirection[i][STDOUT], O_RDWR | S_IRUSR | S_IWUSR);
+        dup2(fd, STDOUT_FILENO);
+        close(fd);
+    }
+}
+
+
+int exec_command(cmd * c)
 {
     pid_t * pid = NULL;
     int ** tube = NULL;
@@ -71,6 +121,12 @@ int exec_command(cmd* c)
 
             c->cmd_members_args[i][c->nb_members_args[i]] = NULL;
 
+            // Exécution des redirections.
+
+            exec_redirection_out(c, i);
+
+            exec_redirection_in(c, i);
+
             if (execvp(c->cmd_members_args[i][0], c->cmd_members_args[i]) == -1)
             {
                 perror("execlp");
@@ -94,6 +150,9 @@ int exec_command(cmd* c)
 
     while(fgets(buffer, 20, stdin) != NULL)
         printf("%s", buffer);
+
+    //while (read(c->cmd_members[c->nb_cmd_members - 1][0], buffer, 1) != 0)
+      //  printf("%s", buffer);
 
     free(pid);
 

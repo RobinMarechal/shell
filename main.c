@@ -28,7 +28,6 @@ int main(int argc, char** argv)
 	char* readlineptr;
 	struct passwd* infos;
 	char hostname[256];
-	char str[1024];
 	char workingdirectory[256];
 
 	while(ret != MYSHELL_FCT_EXIT)
@@ -39,6 +38,8 @@ int main(int argc, char** argv)
         infos=getpwuid(getuid());
 		gethostname(hostname, 256);
 		getcwd(workingdirectory, 256);
+
+        char str[1024];
 
         //Print it to the console
 		sprintf(str, "\n{myshell}%s@%s:%s$ ", infos->pw_name, hostname, workingdirectory);
