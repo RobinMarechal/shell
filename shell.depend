@@ -35,21 +35,32 @@
 	<string.h>
 	"helpers.h"
 
-1451858939 source:/home/techrav/Desktop/shell/shell_fct.c
+1484695119 source:/home/techrav/Desktop/shell/shell_fct.c
 	"shell_fct.h"
+	<sys/types.h>
+	<unistd.h>
+	<stdio.h>
+	<stdlib.h>
+	<sys/stat.h>
+	<fcntl.h>
+	<errno.h>
+	<sys/wait.h>
+	<string.h>
+	"helpers.h"
 
-1451860149 /home/techrav/Desktop/shell/shell_fct.h
+1484695119 /home/techrav/Desktop/shell/shell_fct.h
 	"cmd.h"
 
-1483603527 /home/techrav/Desktop/shell/cmd.h
+1484695119 /home/techrav/Desktop/shell/cmd.h
 
-1483606746 source:/home/techrav/Desktop/shell/cmd.c
+1484820527 source:/home/techrav/Desktop/shell/cmd.c
 	"cmd.h"
 	<string.h>
 	<stdio.h>
 	<stdlib.h>
+	"helpers.h"
 
-1483603561 source:/home/techrav/Desktop/shell/main.c
+1484820521 source:/home/techrav/Desktop/shell/main.c
 	<pwd.h>
 	<readline/readline.h>
 	<stdio.h>
@@ -58,10 +69,19 @@
 	<sys/types.h>
 	<unistd.h>
 	"shell_fct.h"
+	"helpers.h"
 
 1484678879 /home/gregoire/Bureau/shell/helpers.h
 
 1484678879 source:/home/gregoire/Bureau/shell/helpers.c
+	<string.h>
+	<stdlib.h>
+	<stdio.h>
+	"helpers.h"
+
+1484695119 /home/techrav/Desktop/shell/helpers.h
+
+1484695119 source:/home/techrav/Desktop/shell/helpers.c
 	<string.h>
 	<stdlib.h>
 	<stdio.h>

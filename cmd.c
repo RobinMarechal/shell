@@ -191,7 +191,6 @@ void parse_members_args(cmd *c)
             }
         }
 
-
         // allocate c->cmd_members_args[i]
         // malloc enough memory to insert an aditionnal NULL at the end of the array
         if((c->cmd_members_args[i] = (char **) calloc(c->nb_members_args[i] + 1, sizeof(char *))) == NULL)
