@@ -5,6 +5,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <readline/history.h>
 #include "shell_fct.h"
 #include "helpers.h"
 
@@ -43,14 +44,17 @@ int main(int argc, char** argv)
         //Print it to the console
 		sprintf(str, "\n{myshell}%s@%s:%s$ ", infos->pw_name, hostname, workingdirectory);
 
+		// flush
 		readlineptr = readline(str);
+
+        add_history(readlineptr);
 
         //Parse the comand
 
         // Initialisation of the command.
 		struct _command cmd;
 
-        cmd.init_cmd = readlineptr;
+        cmd.init_cmd = strdup(readlineptr);
         cmd.nb_cmd_members = 0;
         cmd.cmd_members = NULL;
         cmd.cmd_members_args = NULL;
@@ -82,7 +86,8 @@ int main(int argc, char** argv)
 		free_members_args(&cmd);
 		free_members(&cmd);
 		free_redirection(&cmd);
-    }
+		free(readlineptr);
+	}
 
 	return 0;
 }
