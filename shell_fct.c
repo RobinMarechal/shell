@@ -68,7 +68,7 @@ int exec_command(cmd * c)
     int * status = NULL;
     unsigned int i;
 
-    char buffer[20] = {0};
+    char buffer[1] = {0};
 
     // Initialiation des pipes.
 
@@ -135,24 +135,15 @@ int exec_command(cmd * c)
         }
     }
 
-    for (i = 0; i < c->nb_cmd_members - 1; i++)
-    {
-        close(tube[i][0]);
-        close(tube[i][1]);
-    }
-
     close(tube[c->nb_cmd_members - 1][1]);
-    dup2(tube[c->nb_cmd_members - 1][0], 0);
-    close(tube[c->nb_cmd_members - 1][0]);
 
     for (i = 0; i < c->nb_cmd_members; i++)
         waitpid(pid[i], &status[i], 0);
 
-    while(fgets(buffer, 20, stdin) != NULL)
+    while (read(tube[c->nb_cmd_members - 1][0], buffer, 1) != 0)
         printf("%s", buffer);
 
-    //while (read(c->cmd_members[c->nb_cmd_members - 1][0], buffer, 1) != 0)
-      //  printf("%s", buffer);
+    close(tube[c->nb_cmd_members - 1][0]);
 
     free(pid);
 
