@@ -11,6 +11,16 @@
 #include <string.h>
 #include "helpers.h"
 
+pid_t currentChild;
+
+
+void alarmHandler(int signum)
+{
+    printf("Too long: killing child process !\n");
+    kill(currentChild, SIGKILL);
+}
+
+
 void exec_redirection_in(cmd * c, int i)
 {
     if (c->redirection_type[i][STDIN] == RFILE)
@@ -19,13 +29,6 @@ void exec_redirection_in(cmd * c, int i)
         dup2(fd, STDIN_FILENO);
         close(fd);
     }
-
-    /*else if (c->redirection_type[i][STDIN] == KEYBOARD)
-    {
-        int fd = open(c->redirection[i][STDIN], O_WRONLY | S_IWUSR);
-        dup2(fd, STDIN_FILENO);
-        close(fd);
-    }*/
 }
 
 
@@ -36,12 +39,7 @@ void exec_redirection_out(cmd * c, int i)
         // S_IRUSR : permission de lecture.
         // S_IWUSR : permission d'écriture.
 
-        int fd = open(c->redirection[i][STDOUT], O_RDWR | O_APPEND | S_IRUSR | S_IWUSR);
-
-        // Si le fichier n'existe pas, on le crée.
-
-        if (fd == -1)
-            fd = creat(c->redirection[i][STDOUT], O_RDWR | S_IRUSR | S_IWUSR);
+        int fd = open(c->redirection[i][STDOUT], O_RDWR | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR);
 
         dup2(fd, STDOUT_FILENO);
         close(fd);
@@ -95,13 +93,12 @@ int exec_command(cmd * c)
 
         pid[i] = fork();
 
+        currentChild = pid[i];
+
         if(pid[i] == 0)
         {
-            if (i > 1)
-            {
-                close(tube[i - 2][0]);
-                close(tube[i - 2][1]);
-            }
+            signal(SIGALRM, alarmHandler);
+            alarm(5);
 
             if (i > 0)
             {
@@ -115,17 +112,13 @@ int exec_command(cmd * c)
             dup2(tube[i][1], 1);
             close(tube[i][1]);
 
-            c->cmd_members_args[i] = realloc(c->cmd_members_args[i], c->nb_members_args[i] + 1);
-
-            c->nb_members_args[i]++;
-
-            c->cmd_members_args[i][c->nb_members_args[i]] = NULL;
-
             // Exécution des redirections.
 
             exec_redirection_out(c, i);
 
             exec_redirection_in(c, i);
+
+            // Exécution des commandes.
 
             if (execvp(c->cmd_members_args[i][0], c->cmd_members_args[i]) == -1)
             {
@@ -133,6 +126,12 @@ int exec_command(cmd * c)
                 exit(errno);
             }
         }
+    }
+
+    if (i > 1)
+    {
+        close(tube[c->nb_cmd_members - 2][0]);
+        close(tube[c->nb_cmd_members - 2][1]);
     }
 
     close(tube[c->nb_cmd_members - 1][1]);

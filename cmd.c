@@ -166,6 +166,7 @@ void parse_members_args(cmd *c)
     if((c->nb_members_args = (unsigned int *) calloc(c->nb_cmd_members, sizeof(unsigned int))) == NULL)
         fatalError("Error: calloc() failed");
 
+
     // For each member
     for(i = 0; i < c->nb_cmd_members; i++)
     {
@@ -193,7 +194,7 @@ void parse_members_args(cmd *c)
 
         // allocate c->cmd_members_args[i]
         // malloc enough memory to insert an aditionnal NULL at the end of the array
-        if((c->cmd_members_args[i] = (char **) calloc(c->nb_members_args[i] + 1, sizeof(char *))) == NULL)
+        if((c->cmd_members_args[i] = (char **) malloc(c->nb_members_args[i] + 1 * sizeof(char *))) == NULL)
             fatalError("Error: calloc() failed");
 
 
@@ -212,6 +213,8 @@ void parse_members_args(cmd *c)
             tok = strtok(NULL, space);
             j++;
         }
+
+        c->cmd_members_args[i][j] = NULL;
     }
 }
 

@@ -9,16 +9,6 @@
 #include "shell_fct.h"
 #include "helpers.h"
 
-void gregoire_tests(cmd * c)
-{
-	exec_command(c);
-}
-
-void robin_tests()
-{
-	// Je mets les miens ici
-}
-
 //To complete
 int main(int argc, char** argv)
 {
@@ -44,10 +34,14 @@ int main(int argc, char** argv)
         //Print it to the console
 		sprintf(str, "\n{myshell}%s@%s:%s$ ", infos->pw_name, hostname, workingdirectory);
 
-		// flush
 		readlineptr = readline(str);
 
         add_history(readlineptr);
+
+
+        // If nothing is entered by the user, we skip the iteration.
+        if (*readlineptr == NULL)
+            continue;
 
         //Parse the comand
 
@@ -76,11 +70,9 @@ int main(int argc, char** argv)
 		}
 
 		// PRINT FUNCTIONS
-		print_cmd(&cmd);
+		//print_cmd(&cmd);
 
-		gregoire_tests(&cmd);
-
-		robin_tests();
+		exec_command(&cmd);
 
 		// FREES
 		free_members_args(&cmd);
